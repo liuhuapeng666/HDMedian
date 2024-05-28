@@ -1,8 +1,16 @@
-geneSetDat <- readRDS("geneSetDat.rds")
-
+##########################################################################
 ## plots heatmaps of correlation matrices for each gene set
+##########################################################################
+
+# install necessary packages
+if (!require("ggplot2", quietly = TRUE)) install.packages("ggplot2")
+if (!require("gridExtra", quietly = TRUE)) install.packages("gridExtra")
+
+# load necessary packages
 library(ggplot2)
 library(gridExtra)
+
+geneSetDat <- readRDS("geneSetDat.rds")
 
 pdf("heatmap_correlation_matrices.pdf", width = 12, height = 15)  # Adjust width and height as needed
 
@@ -10,7 +18,6 @@ plots <- list()
 plot_count <- 1
 for (ss in 1:length(P0)) {
   dat_tmp <- geneSetDat[[ss]]$dat
-  
   for (group in 1:3) {
     corr_mat <- cor(dat_tmp[[group]])
     cor_df <- as.data.frame(as.table(corr_mat))
@@ -30,7 +37,7 @@ for (ss in 1:length(P0)) {
     plot_count <- plot_count + 1
   }
   
-  # If we have 12 plots, arrange them in a 3x5 grid and start a new page
+  # If we have 15 plots, arrange them in a 3x5 grid and start a new page
   if (plot_count > 15) {
     grid.arrange(grobs = plots, ncol = 3, nrow = 5)
     plots <- list()  # Reset the list
