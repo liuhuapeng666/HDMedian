@@ -58,8 +58,8 @@ for (i in 1:length(real_MANOVA)) {
   res_Lin2021 <- real_MANOVA[[i]]$res_Lin2021
 
   res_summ$median_non_std[i] <- mean(res_median$test_stat_median<res_median$res_median_boot)
-  res_summ$median_std_T_s[i] <- mean(res_median$test_stat_median_std<res_median$res_median_std_boot)
-  res_summ$median_std_T_s_tilde[i] <- mean(res_median$test_stat_median_std<res_median$res_median_std_boot_old)
+  res_summ$median_std_T_s[i] <- mean(res_median$test_stat_median_std<res_median$res_median_std_boot_old)
+  res_summ$median_std_T_s_tilde[i] <- mean(res_median$test_stat_median_std<res_median$res_median_std_boot)
   res_summ$mean_Lin2021_non_std[i] <- mean(res_Lin2021$test_stat_mean<res_Lin2021$res_mean_boot)
   res_summ$mean_Lin2021_std[i] <- mean(res_Lin2021$test_stat_mean_std<res_Lin2021$res_mean_std_boot)
 }
@@ -77,7 +77,7 @@ saveRDS(res_summ_adjust, "real_data_adjusted_p_values.rds")
 #### the number of gene sets identified by each method
 apply(res_summ_adjust, 2, function(x) sum(x<0.01))
 # median_non_std median_std_T_s median_std_T_s_tilde mean_Lin2021_non_std mean_Lin2021_std 
-#             69            141                  145                   64              140
+#             69            145                  141                   64              140
 
 
 ################################################################################
@@ -88,6 +88,7 @@ library(breastCancerMAINZ)
 library(Biobase)
 library(moments)
 res_summ_adjust <- readRDS("./real_data_adjusted_p_values.rds")
+
 tmp1 <- which(res_summ_adjust[, 1]<0.01 & res_summ_adjust[, 4]>0.01)
 
 cols <- colnames(geneSetDat[[tmp1[1]]]$dat[[1]])
