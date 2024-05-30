@@ -1,17 +1,24 @@
-##########################################################################
+################################################################################
 ######## MANOVA on gene sets data
-##########################################################################
-# load functions for MANOVA
-source("./HD_MANOVA_GM_functions.R")
+################################################################################
 
-# load necessary packages
+## Install packages
+if (!require("mvtnorm", quietly = TRUE)) install.packages("mvtnorm")
+if (!require("Gmedian", quietly = TRUE)) install.packages("Gmedian")
+if (!require("extraDistr", quietly = TRUE)) install.packages("extraDistr")
+if (!require("doRNG", quietly = TRUE)) install.packages("doRNG")
+if (!require("moments", quietly = TRUE)) install.packages("moments")
+
+## load packages
 library(mvtnorm)
 library(Gmedian)
-library(flare)
 library(extraDistr)
 library(doRNG)
 
-# load gene sets data
+## load functions for MANOVA
+source("./HD_MANOVA_GM_functions.R")
+
+## load gene sets data
 geneSetDat <- readRDS("geneSetDat.rds")
 
 # use parallel computing
@@ -39,7 +46,9 @@ real_MANOVA <- foreach(ss = 1:length(geneSetDat),
 parallel::stopCluster(cl)
 # saveRDS(real_MANOVA, "res_real_data_MANOVA.rds")
 
-## summarize the results to get the p-values of each test
+real_MANOVA <- readRDS("./res_real_data_MANOVA.rds")
+
+#### summarize the results to get the p-values of each method
 res_summ <- data.frame(matrix(NA, length(real_MANOVA), 5))
 names(res_summ) <- c("median_non_std", "median_std_T_s", "median_std_T_s_tilde",
                      "mean_Lin2021_non_std", "mean_Lin2021_std")
@@ -60,11 +69,15 @@ res_summ_adjust <- matrix(0, nrow(res_summ), 5)
 for (j in 1:5) {
   res_summ_adjust[, j] <- p.adjust(res_summ[,j], method="BY")
 }
+colnames(res_summ_adjust) <- c("median_non_std", "median_std_T_s",
+                               "median_std_T_s_tilde",
+                               "mean_Lin2021_non_std", "mean_Lin2021_std")
 saveRDS(res_summ_adjust, "real_data_adjusted_p_values.rds")
 
-## the number of gene sets identified by each method
+#### the number of gene sets identified by each method
 apply(res_summ_adjust, 2, function(x) sum(x<0.01))
-## 69 141 145  64 140
+# median_non_std median_std_T_s median_std_T_s_tilde mean_Lin2021_non_std mean_Lin2021_std 
+#             69            141                  145                   64              140
 
 
 ################################################################################
@@ -93,7 +106,7 @@ dat11 <- t(dat)[,tmp3]
 # calculate the marginal kurtoses of all genes
 tmp4 <- apply(dat11, 2, kurtosis)
 
-# plot the histrogram of kurtoses
+## plot the histrogram of kurtoses
 pdf(file="real_data_kurtosis_histogram.pdf", width=10, height=8)
 par(mar=c(5, 5, 2.5, 2.5), oma=c(1, 1, 0, 0), lwd=4)
 hist(tmp4, nclass=20, xaxt="n", yaxt="n", xlab="Kurtosis",
